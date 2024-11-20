@@ -1,4 +1,4 @@
-# Welcome to the spotifyhalloffame wiki!
+# Welcome to the Spotify Hall of Fame README!
 
 You can find information about the Hall of Fame features, schema, and wireframes here.
 * [Features](https://github.com/sarahshihmi/spotifyhalloffame/wiki/Features): for understanding what this app can do.

@@ -1,0 +1,18 @@
+{
+  "name": "spotifyhalloffame",
+  "version": "1.0.0",
+  "description": "You can find information about the Hall of Fame features, schema, and wireframes here. * [Features](https://github.com/sarahshihmi/spotifyhalloffame/wiki/Features): for understanding what this app can do. * [Wireframes](https://github.com/sarahshihmi/spotifyhalloffame/wiki/Wireframes): for a high-level design overview. * [Database Schema](https://github.com/sarahshihmi/spotifyhalloffame/wiki/Database-Schema): for a in-depth look of how data is connected. * [User Stories](https://github.com/sarahshihmi/spotifyhalloffame/wiki/User-Stories): for understanding why we have these features.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install": "npm --prefix backend install backend",
+    "dev:backend": "npm install --prefix backend start",
+    "sequelize": "npm run --prefix backend sequelize",
+    "sequelize-cli": "npm run --prefix backend sequelize-cli",
+    "start": "npm start --prefix backend",
+    "build": "npm run --prefix backend build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

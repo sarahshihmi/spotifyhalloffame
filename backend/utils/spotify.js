@@ -10,7 +10,7 @@ const spotifyApi = new SpotifyWebApi({
 // generate the spotify auth url
 function getSpotifyAuthUrl() {
   const scopes = [
-    'user-read-private',    // access private data...
+    'user-read-private',    // access private data which includes name, profile pic, and country
     'user-read-email',      // access email
   ];
   return spotifyApi.createAuthorizeURL(scopes);
@@ -22,7 +22,7 @@ async function getTokensFromCode(code) {
     const data = await spotifyApi.authorizationCodeGrant(code); // give code, get token
     spotifyApi.setAccessToken(data.body['access_token']); // set base token
     spotifyApi.setRefreshToken(data.body['refresh_token']); // set refresh token
-    return data.body; // Return tokens and expiration info
+    return data.body; // return tokens and expiration info
   } catch (err) {
     console.error('Error exchanging authorization code:', err);
     throw err;

@@ -7,37 +7,37 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       spotify_id: {
-        type: Sequelize.TEXT
-      },
-      first_name: {
-        type: Sequelize.TEXT
-      },
-      last_name: {
-        type: Sequelize.TEXT
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true, 
       },
       email: {
-        type: Sequelize.TEXT
+        type: Sequelize.STRING,
+        allowNull: true,
+        unique: true, 
       },
-      profile_image: {
-        type: Sequelize.TEXT
+      access_token: {
+        type: Sequelize.TEXT,
+        allowNull: false, // need for API requests
       },
-      spotify_url: {
-        type: Sequelize.TEXT
+      refresh_token: {
+        type: Sequelize.TEXT,
+        allowNull: false, // need for token refresh
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Users');
-  }
+  },
 };

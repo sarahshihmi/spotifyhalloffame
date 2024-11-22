@@ -11,3 +11,4 @@ const validateTenEntry = [
 ]   
 
 //GET top 10 entries
+console.log('this is the start of the 24h lockdown <3')

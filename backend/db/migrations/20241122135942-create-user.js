@@ -9,14 +9,23 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      username: {
-        type: Sequelize.STRING
+      spotify_id: {
+        type: Sequelize.TEXT
+      },
+      first_name: {
+        type: Sequelize.TEXT
+      },
+      last_name: {
+        type: Sequelize.TEXT
       },
       email: {
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
       },
-      hashedPassword: {
-        type: Sequelize.STRING
+      profile_image: {
+        type: Sequelize.TEXT
+      },
+      spotify_url: {
+        type: Sequelize.TEXT
       },
       createdAt: {
         allowNull: false,

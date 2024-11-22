@@ -26,7 +26,7 @@ router.get('/', async(req, res)=> {                             // calling get o
     }
 })
 
-module.exports = router;
+
 
 
 //POST hall of fame entries
@@ -42,7 +42,7 @@ router.post('/', async(req, res)=> {
 
 
 //PUT hall of fame entry
-router.put('/:id', async(req, res)=>{
+router.put('/:id', validateHallEntry, async(req, res)=>{
     const { id } = req.params
     const {artist_name, song_name} = req.body
 
@@ -80,3 +80,5 @@ router.delete('/:id', async(req, res)=> {
         return res.status(500).json({error: 'Internal Server Error'})
     }
 })
+
+module.exports = router;

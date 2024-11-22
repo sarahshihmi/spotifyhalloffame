@@ -1,5 +1,5 @@
 const express = require('express')
-const { spotifyApi, getSpotifyAuthUrl, getTokensFromCode } = require('../../utils/spotify');
+const { spotifyApi, getSpotifyAuthUrl, getTokensFromCode, searchArtist, searchTrack } = require('../../utils/spotify');
 const { User } = require('../../db/models');
 const router = express.Router()
 
@@ -43,4 +43,35 @@ router.get('/callback', async (req, res)=> {
     }
 })
 
+//search artists
+router.get('/search-artists', async (req, res)=>{
+    const { query } = req.query
+    if (!query) {
+        return res.status(400).json({error: 'Please enter an artist'})
+    }
+
+    try{
+        const artists = await searchArtist(query)
+        res.status(200).json(artists)
+    } catch (err) {
+        console.error('Error in /search-artists', err)
+        res.status(500).json({error:'Internal Server Error'})
+    }
+})
+
+
+router.get('/search-tracks', async (req, res) =>{
+    const { query } = req.query
+    if (!query){
+        return res.status(400).json({error: 'Please enter a track name'})
+    }
+
+    try{
+        const tracks = await searchTrack(query)
+        res.status(200).json(tracks)
+    } catch (err) {
+        console.error('Error in /search-tracks', err)
+        res.status(500).json({error:'Internal Server Error'})
+    }
+})
 module.exports = router;

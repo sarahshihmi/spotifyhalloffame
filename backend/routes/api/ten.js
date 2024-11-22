@@ -2,7 +2,10 @@ const express = require('express')
 const router = express.Router()
 const { check } = require('express-validator')
 const { handleValidationErrors } = require('../../utils/validation')
+const requireAuth = require('../../utils/auth');
 const { Ten } = require('../../db/models')
+
+router.use(requireAuth);
 
 const validateTenEntry = [
     check('artist_name').exists({checkFalsy:true}).isLength({min:1}).withMessage('Artist name is required.'),
@@ -15,6 +18,7 @@ const validateTenEntry = [
 router.get('/', async (req, res) => {
     try{
         const tenEntries= await Ten.findAll({
+            where: { user_id: req.user.id },
             order:[['rank', 'ASC']]
         })
         return res.json(tenEntries)
@@ -28,11 +32,35 @@ router.get('/', async (req, res) => {
 //POST top 10 entries
 router.post('/', validateTenEntry, async (req, res) => {
     const { artist_name, song_name, rank } = req.body
+
+    if (rank < 1 || rank > 15) {
+        return res.status(400).json({ error: 'Rank must be between 1 and 15.' });
+    }
+
     try{
-        const newEntry = await Ten.create({artist_name, song_name, rank})
-        res.status(201).json(newEntry)
+        const entryCount = await Ten.count({ where: { user_id: req.user.id } });
+
+        if (entryCount >= 15) {
+        return res.status(400).json({ error: 'You can only have 10 entries + 5 honorable mentions in your Top Ten list.' });
+        }
+
+        const rankConflict = await Ten.findOne({
+            where: { user_id: req.user.id, rank }
+        });
+        
+        if (rankConflict) {
+            return res.status(400).json({ error: 'This rank is already assigned to another entry.' });
+        }
+
+        const newEntry = await Ten.create({
+            user_id: req.user.id,
+            artist_name, 
+            song_name, 
+            rank
+        })
+        res.status(201).json({message: 'Top Ten List entry updated successfully', newEntry})
     } catch (err){
-        console.error('Error adding Top Ten List entry', err)
+        console.error('Error creating Top Ten entry', err)
         return res.status(500).json({error: 'Internal Server Error'})
     }
 })
@@ -40,21 +68,35 @@ router.post('/', validateTenEntry, async (req, res) => {
 //PUT top 10 entries
 router.put('/:id', validateTenEntry, async (req, res)=> {
     const { id } = req.params
-    const { artist_name, song_name, rank } = req.body
-    try{
-        const entry = await Ten.findByPk(id)
 
-        if(!entry){
-            return res.status(404).json({error: 'Top Ten entry does not exist'})
+    if (isNaN(id)) {
+        return res.status(400).json({ error: 'Invalid entry ID.' });
+    }
+
+    
+    try{
+        const { artist_name, song_name, rank } = req.body
+
+        const [rankConflict, entry] = await Promise.all([
+            Ten.findOne({ where: { user_id: req.user.id, rank } }),
+            Ten.findOne({ where: { id, user_id: req.user.id } })
+        ]);
+        
+        if (!entry) {
+            return res.status(404).json({ error: 'Top Ten entry does not exist' });
+        }
+        
+        if (rankConflict && rankConflict.id !== parseInt(id)) {
+            return res.status(400).json({ error: 'This rank is already assigned to another entry.' });
         }
 
         entry.artist_name = artist_name
         entry.song_name = song_name
         entry.rank = rank
         await entry.save()
-        return res.status(200).json({message:'Top Ten List entry updated successfully'})
+        return res.status(200).json({message:'Top Ten List entry updated successfully', entry})
     } catch (err) {
-        console.error('Error editing Top Ten entry', err)
+        console.error('Error updating Top Ten entry', err)
         return res.status(500).json({error: 'Internal Server Error'})
     }
 })
@@ -63,8 +105,15 @@ router.put('/:id', validateTenEntry, async (req, res)=> {
 //DELETE top 10 entry
 router.delete('/:id', async(req, res)=>{
     const { id } = req.params
+
+    if (isNaN(id)) {
+        return res.status(400).json({ error: 'Invalid entry ID.' });
+    }
+
     try{
-        const entry = await Ten.findByPk(id)
+        const entry = await Ten.findOne({
+            where: { id, user_id: req.user.id }
+        })
 
         if (!entry){
             return res.status(404).json({error: 'Top Ten entry not found'})

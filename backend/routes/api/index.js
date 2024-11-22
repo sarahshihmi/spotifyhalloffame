@@ -1,5 +1,4 @@
 const router = require('express').Router();
-const usersRouter = require('./users.js');
 const spotifyRouter = require ('./spotify.js');
 const hallRouter = require('./hall.js');
 const tenRouter = require('./ten.js');
@@ -11,7 +10,6 @@ const tenRouter = require('./ten.js');
 
 
 
-router.use('/users', usersRouter);
 
 router.use('/spotify', spotifyRouter);
 

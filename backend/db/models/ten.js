@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
       unique: 'userRank',
       validate: {
         min: 1,
-        max: 10,
+        max: 15,
       },
     },
     artist_name: {

@@ -3,6 +3,7 @@ const router = express.Router() //defining the router
 const { check } = require('express-validator'); // this is a check
 const { handleValidationErrors } = require ('../../utils/validation') //for validation
 const { Hall } = require ('../../db/models') //referencing the Hall model
+const restoreUser = require('../../utils/restoreuser');
 const requireAuth = require('../../utils/auth'); //auth
 
 

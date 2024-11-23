@@ -1,4 +1,5 @@
 const SpotifyWebApi = require('spotify-web-api-node');
+const { User } = require('../db/models');
 
 // initialize the api
 const spotifyApi = new SpotifyWebApi({
@@ -30,12 +31,22 @@ async function getTokensFromCode(code) {
 }
 
 //refresh access token if expired for some reason
-async function refreshAccessToken() {
+async function refreshAccessToken(userId) {
   try {
-    const data = await spotifyApi.refreshAccessToken();
-    spotifyApi.setAccessToken(data.body['access_token']); // update access token
-    console.log('Access token refreshed successfully');
-    return data.body;
+    const user = await User.findByPk(userId);
+    if (!user || !user.refresh_token) {
+      throw new Error('No refresh token found for user');
+    }
+
+    spotifyApi.setRefreshToken(user.refresh_token); // Set the user's refresh token
+    const data = await spotifyApi.refreshAccessToken(); // Refresh the token
+    const newAccessToken = data.body.access_token;
+
+    // Update the user's access token in the database
+    user.access_token = newAccessToken;
+    await user.save();
+
+    return newAccessToken;
   } catch (err) {
     console.error('Error refreshing access token:', err);
     throw err;
@@ -43,8 +54,9 @@ async function refreshAccessToken() {
 }
 
 // search artist
-async function searchArtist(artistName) {
+async function searchArtist(artistName, token) {
   try {
+    spotifyApi.setAccessToken(token);
     const data = await spotifyApi.searchArtists(artistName); // call spotify api
     return data.body.artists.items; // return artists
   } catch (err) {
@@ -54,8 +66,9 @@ async function searchArtist(artistName) {
 }
 
 // search for a song
-async function searchTrack(trackName) {
+async function searchTrack(trackName, token) {
   try {
+    spotifyApi.setAccessToken(token);
     const data = await spotifyApi.searchTracks(trackName); // call spotify api
     return data.body.tracks.items; // return tracks
   } catch (err) {

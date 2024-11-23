@@ -1,4 +1,6 @@
 const router = require('express').Router();
+const restoreUser = require('../../utils/restoreuser');
+const requireAuth = require('../../utils/auth');
 const spotifyRouter = require ('./spotify.js');
 const hallRouter = require('./hall.js');
 const tenRouter = require('./ten.js');
@@ -9,13 +11,13 @@ const tenRouter = require('./ten.js');
   // If current user session is not valid, set req.user to null
 
 
-
+router.use(restoreUser); 
 
 router.use('/spotify', spotifyRouter);
 
-router.use('/hall', hallRouter);
+router.use('/hall', requireAuth, hallRouter);
 
-router.use('/ten', tenRouter);
+router.use('/ten', requireAuth, tenRouter);
 
 router.post('/test', (req, res) => {
   res.json({ requestBody: req.body });

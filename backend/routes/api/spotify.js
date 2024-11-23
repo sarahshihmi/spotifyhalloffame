@@ -1,7 +1,8 @@
 const express = require('express')
-const { spotifyApi, getSpotifyAuthUrl, getTokensFromCode, searchArtist, searchTrack } = require('../../utils/spotify');
+const { spotifyApi, getSpotifyAuthUrl, refreshAccessToken, getTokensFromCode, searchArtist, searchTrack } = require('../../utils/spotify');
 const { User } = require('../../db/models');
 const router = express.Router()
+const jwt = require('jsonwebtoken');
 
 //redirect route to spotify login
 router.get('/login', (req, res)=> {
@@ -31,10 +32,13 @@ router.get('/callback', async (req, res)=> {
             }
         })
 
+        const payload = { id: user.id };
+        const appToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+
         res.status(200).json({
             message:'Authentication successful',
             user,
-            tokens,
+            token: appToken
         })
 
     } catch (err) {
@@ -51,12 +55,28 @@ router.get('/search-artists', async (req, res)=>{
     }
 
     try{
-        const artists = await searchArtist(query)
+        const token = req.user.access_token; // Retrieve the user's token
+        if (!token) {
+          return res.status(401).json({ error: 'No access token found. Please log in.' });
+        }
+
+        const artists = await searchArtist(query, token)
         res.status(200).json(artists)
     } catch (err) {
-        console.error('Error in /search-artists', err)
-        res.status(500).json({error:'Internal Server Error'})
-    }
+        // If the token is expired, refresh it
+        if (err.body?.error?.message === 'The access token expired') {
+          try {
+            token = await refreshAccessToken(req.user.id); // Refresh the token
+            const artists = await searchArtist(query, token); // Retry the request with new token
+            return res.status(200).json(artists);
+          } catch (refreshError) {
+            console.error('Error refreshing token:', refreshError);
+            return res.status(500).json({ error: 'Could not refresh access token' });
+          }
+        }
+        console.error('Error in /search-artists', err);
+        return res.status(500).json({ error: 'Internal Server Error' });
+      }
 })
 
 
@@ -67,11 +87,27 @@ router.get('/search-tracks', async (req, res) =>{
     }
 
     try{
-        const tracks = await searchTrack(query)
+
+        const token = req.user.access_token; // Retrieve the user's token
+        if (!token) {
+          return res.status(401).json({ error: 'No access token found. Please log in.' });
+        }
+        const tracks = await searchTrack(query, token)
         res.status(200).json(tracks)
     } catch (err) {
-        console.error('Error in /search-tracks', err)
-        res.status(500).json({error:'Internal Server Error'})
-    }
+        // If the token is expired, refresh it
+        if (err.body?.error?.message === 'The access token expired') {
+          try {
+            token = await refreshAccessToken(req.user.id); // Refresh the token
+            const tracks = await searchTrack(query, token); // Retry the request with new token
+            return res.status(200).json(tracks);
+          } catch (refreshError) {
+            console.error('Error refreshing token:', refreshError);
+            return res.status(500).json({ error: 'Could not refresh access token' });
+          }
+        }
+        console.error('Error in /search-artists', err);
+        return res.status(500).json({ error: 'Internal Server Error' });
+      }
 })
 module.exports = router;

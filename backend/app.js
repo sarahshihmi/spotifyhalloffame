@@ -17,6 +17,7 @@ app.use(morgan('dev'));
 
 app.use(cookieParser());
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 // Security Middleware
 if (!isProduction) {
@@ -36,7 +37,7 @@ if (!isProduction) {
     csurf({
       cookie: {
         secure: isProduction,
-        sameSite: isProduction && "Lax",
+        sameSite: isProduction ? "Lax" : "Strict",
         httpOnly: true
       }
     })

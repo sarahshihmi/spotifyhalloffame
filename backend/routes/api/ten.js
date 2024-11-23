@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const { check } = require('express-validator')
 const { handleValidationErrors } = require('../../utils/validation')
+const restoreUser = require('../../utils/restoreuser');
 const requireAuth = require('../../utils/auth');
 const { Ten } = require('../../db/models')
 

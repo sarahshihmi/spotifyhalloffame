@@ -66,7 +66,7 @@ const Hall = () => {
 
       <div className="hall-grid">
         {songs.length === 0 ? (
-          <p>No songs added yet. Click "Add" to start!</p>
+          <p>No songs added yet. Click Add to start!</p>
         ) : (
           songs.map((song) => (
             <div key={song.id} className="song-card">

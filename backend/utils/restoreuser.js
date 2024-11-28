@@ -11,10 +11,10 @@ const restoreUser = async (req, res, next) => {
   const token = authHeader.replace('Bearer ', '');
 
   try {
-    // Verify your app's JWT
+    // Verify JWT
     const payload = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findByPk(payload.id); // Fetch user from DB
 
-    const user = await User.findByPk(payload.id); // Find user in the database
     if (!user) {
       req.user = null;
       return next();

@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
+import * as sessionActions from './store/session';
 import Hall from './components/Hall';
-import HallForm from './components/HallForm';
 import Landing from './components/Landing';
 import Navbar from './components/Navbar';
 import Ten from './components/Ten';
-import TenForm from './components/TenForm';
+import SearchArtist from "./components/SearchArtist";
+import SearchTrack from "./components/SearchTrack";
+
 
 
 function Layout() {
@@ -14,18 +16,32 @@ function Layout() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
+    const fetchCsrfToken = async () => {
+      try {
+        const response = await fetch("/api/csrf/restore", {
+          credentials: "include", // Ensures cookies are included
+        });
+        if (!response.ok) throw new Error("Failed to restore CSRF token");
+        console.log("CSRF token restored");
+      } catch (err) {
+        console.error("Error fetching CSRF token:", err);
+      }
+    };
+
+    fetchCsrfToken(); // Fetch CSRF token on app load
     dispatch(sessionActions.restoreUser()).then(() => {
-      setIsLoaded(true)
+      setIsLoaded(true);
     });
   }, [dispatch]);
 
   return (
     <>
-      <Navigation isLoaded={isLoaded} />
+      <Navbar isLoaded={isLoaded} />
       {isLoaded && <Outlet />}
     </>
   );
 }
+
 
 const App = () => {
   const router = createBrowserRouter([
@@ -34,20 +50,28 @@ const App = () => {
       children: [
         {
           path: '/',
-          element: <Landing />
+          element: <Landing />,
         },
         {
-          path:'/hall',
-          element: <Hall />
+          path: '/hall',
+          element: <Hall />,
         },
         {
-          path:'ten',
-          element:<Ten />
-        }
-
-      ]
-    }
-  ])
-}
+          path: '/ten',
+          element: <Ten />,
+        },
+        {
+          path: "/search-artist",
+          element: <SearchArtist />,
+        },
+        {
+          path: "/search-track",
+          element: <SearchTrack />,
+        },
+      ],
+    },
+  ]);
+  return <RouterProvider router={router} />;
+};
 
 export default App;

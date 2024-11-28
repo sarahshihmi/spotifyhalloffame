@@ -66,16 +66,18 @@ async function searchArtist(artistName, token) {
 }
 
 // search for a song
-async function searchTrack(trackName, token) {
+const searchTrack = async (query, token) => {
+  spotifyApi.setAccessToken(token);
+
   try {
-    spotifyApi.setAccessToken(token);
-    const data = await spotifyApi.searchTracks(trackName); // call spotify api
-    return data.body.tracks.items; // return tracks
-  } catch (err) {
-    console.error('Error searching for track:', err);
-    throw err;
+    const response = await spotifyApi.searchTracks(query);
+    console.log("Raw track response from Spotify:", response.body);
+    return response.body;
+  } catch (error) {
+    console.error("Error in searchTrack utility:", error);
+    throw error;
   }
-}
+};
 
 
 module.exports = {spotifyApi, getSpotifyAuthUrl, getTokensFromCode, refreshAccessToken, searchArtist, searchTrack};

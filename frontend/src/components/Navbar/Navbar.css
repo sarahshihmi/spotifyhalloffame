@@ -1,0 +1,40 @@
+/* */
+.navbar {
+    display: flex;
+    justify-content: space-between; /* space out 3 sections */
+    align-items: center;  /* */
+    padding: 10px 20px;
+    background-color: #242424;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.left-bar {
+    display: flex;
+    align-items: center;
+}
+
+.center-bar {
+    display: flex;
+    gap: 20px; /* Space between links */
+    align-items: center;
+    justify-content: center;
+    flex: 1; /* Push this section to the center */
+}
+
+.right-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.nav-logo-icon {
+    height: 40px; /* Adjust based on desired size */
+    cursor: pointer; /* Make it clickable */
+}
+
+.profile-button {
+    display: flex;
+    align-items: center;
+    cursor: pointer; /* Indicate it's clickable */
+}

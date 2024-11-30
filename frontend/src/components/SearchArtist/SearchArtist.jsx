@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const SearchArtist = () => {
   const [searchInput, setSearchInput] = useState("");
   const [artistResults, setArtistResults] = useState([]);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams(); // Retrieve query parameters
+  const mode = searchParams.get("mode") || "hall"; 
 
   const handleSearch = async () => {
     try {
@@ -22,7 +24,7 @@ const SearchArtist = () => {
   };
 
   const handleSelectArtist = (artistId) => {
-    navigate(`/search-track?artistId=${artistId}`);
+    navigate(`/search-track?artistId=${artistId}&mode=${mode}`);
   };
 
   return (

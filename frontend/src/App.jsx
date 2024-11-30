@@ -65,6 +65,14 @@ const App = () => {
           element: <SearchArtist />,
         },
         {
+          path: "/search-track/ten",
+          element: <SearchTrack mode="ten" />,
+        },
+        {
+          path: "/search-track/hall",
+          element: <SearchTrack mode="hall" />,
+        },
+        {
           path: "/search-track",
           element: <SearchTrack />,
         },

@@ -2,9 +2,9 @@ const express = require('express')
 const router = express.Router()
 const { check } = require('express-validator')
 const { handleValidationErrors } = require('../../utils/validation')
-const restoreUser = require('../../utils/restoreuser');
 const requireAuth = require('../../utils/auth');
 const { Ten } = require('../../db/models')
+const { searchTrack } = require('../../utils/spotify')
 
 router.use(requireAuth);
 
@@ -17,18 +17,46 @@ const validateTenEntry = [
 
 //GET top 10 entries
 router.get('/', async (req, res) => {
-    try{
-        const tenEntries= await Ten.findAll({
+    try {
+        const tenEntries = await Ten.findAll({
             where: { user_id: req.user.id },
-            order:[['rank', 'ASC']]
-        })
-        return res.json(tenEntries)
-    } catch (err){
-        console.error('Error fetching Top Ten entries', err)
-        return res.status(500).json({error: 'Internal Server Error'})
-    }
-})
+            order: [['rank', 'ASC']],
+        });
 
+        const token = req.user.access_token; // Retrieve user's access token
+        const enrichedEntries = await Promise.all(
+            tenEntries.map(async (entry) => {
+                try {
+                    console.log(`Fetching Spotify data for "${entry.song_name}" by "${entry.artist_name}"`);
+                    const searchResults = await searchTrack(entry.song_name, token); // Fetch track data from Spotify
+                    console.log(`Spotify API response for "${entry.song_name}":`, JSON.stringify(searchResults, null, 2));
+
+                    const track = searchResults.tracks.items.find(
+                        (track) =>
+                            track.name.toLowerCase() === entry.song_name.toLowerCase() &&
+                            track.artists.some((artist) => artist.name.toLowerCase() === entry.artist_name.toLowerCase())
+                    );
+                    if (!track) {
+                        console.error(`No match found for "${entry.song_name}" by "${entry.artist_name}"`);
+                        return { ...entry.toJSON(), albumImage: null };
+                    }
+
+                    // Include album image in the enriched entry
+                    console.log(`Matching track for "${entry.song_name}" by "${entry.artist_name}":`, track);
+                    return { ...entry.toJSON(), albumImage: track?.album.images?.[0]?.url || null };
+                } catch (err) {
+                    console.error(`Error fetching image for song "${entry.song_name}":`, err);
+                    return { ...entry.toJSON(), albumImage: null }; // Fallback to null if image fetch fails
+                }
+            })
+        );
+
+        res.status(200).json({ status: 'Top Ten entries retrieved successfully', data: enrichedEntries });
+    } catch (err) {
+        console.error('Error fetching Top Ten entries', err);
+        return res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 
 //POST top 10 entries
 router.post('/', validateTenEntry, async (req, res) => {

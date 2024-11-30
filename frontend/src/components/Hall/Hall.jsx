@@ -59,7 +59,7 @@ const Hall = () => {
 
       <div className="hall-actions">
         <button className="sort-button">Sort</button>
-        <NavLink to="/search-artist" className="add-button">
+        <NavLink to="/search-artist?mode=hall" className="add-button">
           Add
         </NavLink>
       </div>

@@ -6,19 +6,20 @@ const getCsrfTokenFromCookie = () => {
   return match ? decodeURIComponent(match[1]) : null;
 };
 
-const SearchTrack = () => {
-  const [searchParams] = useSearchParams();
-  const [searchInput, setSearchInput] = useState("");
-  const [trackResults, setTrackResults] = useState([]);
-  const [selectedTrack, setSelectedTrack] = useState(null);
-  const [existingEntry, setExistingEntry] = useState(null); // Track existing entry
-  const [showConfirmation, setShowConfirmation] = useState(false); // Toggle confirmation screen
+const SearchTrack = ({ mode }) => {
+const [searchParams] = useSearchParams();
+const [searchInput, setSearchInput] = useState("");
+const [trackResults, setTrackResults] = useState([]);
+const [selectedTrack, setSelectedTrack] = useState(null);
+const [existingEntry, setExistingEntry] = useState(null); // Track existing entry
+const [showConfirmation, setShowConfirmation] = useState(false); // Toggle confirmation screen
   
-  const navigate = useNavigate();
+const navigate = useNavigate();
 
-  const artistId = searchParams.get("artistId");
+const artistId = searchParams.get("artistId");
 
-  const handleSearch = async () => {
+
+const handleSearch = async () => {
     try {
       const response = await fetch(
         `/api/spotify/search-tracks?query=${searchInput}&artistId=${artistId}`,
@@ -48,6 +49,9 @@ const SearchTrack = () => {
     setSelectedTrack(trackId);
   };
 
+mode = searchParams.get("mode") || "hall"; // Fallback to "hall" if no mode
+
+
   const handleConfirmSelection = async () => {
     try {
       const selected = trackResults.find((track) => track.id === selectedTrack);
@@ -57,21 +61,32 @@ const SearchTrack = () => {
         console.error("No token found in localStorage");
         throw new Error("Authorization token missing");
       }
+
+      const body = {
+        artist_name: selected.artists[0].name,
+        song_name: selected.name,
+      };
+
+      if (mode === "ten") {
+        const rank = prompt("Enter the rank for this song (1-15):");
+        if (!rank || isNaN(rank) || rank < 1 || rank > 15) {
+          alert("Invalid rank! Please enter a number between 1 and 15.");
+          return;
+        }
+        body.rank = parseInt(rank, 10);
+      }
   
-      const response = await fetch("/api/hall", {
+      const response = await fetch(`/api/${mode}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
           "X-CSRF-Token": getCsrfTokenFromCookie(),
         },
-        body: JSON.stringify({
-          artist_name: selected.artists[0].name,
-          song_name: selected.name,
-        }),
+        body: JSON.stringify(body),
       });
   
-      if (response.status === 409) {
+      if (response.status === 409 && mode === "hall") {
         const data = await response.json();
         setExistingEntry(data.data); // Capture existing entry data
         setShowConfirmation(true); // Show confirmation screen
@@ -81,12 +96,12 @@ const SearchTrack = () => {
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Error response:", errorData);
-        throw new Error("Failed to add entry to Hall of Fame");
+        throw new Error("Failed to add entry");
       }
   
-      navigate("/hall");
+      navigate(`/${mode}`);
     } catch (err) {
-      console.error("Error adding track to Hall of Fame:", err);
+      console.error(`Error adding track to ${mode === "hall" ? "Hall of Fame" : "Top Ten List"}:`, err);
     }
   };
 

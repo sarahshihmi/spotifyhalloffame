@@ -32,9 +32,7 @@ router.get('/', async(req, res)=> {                             // calling get o
         const enrichedEntries = await Promise.all( // enrich each entry with album image data from Spotify
             hallEntries.map(async (entry) => {
                 try {
-                    console.log(`Fetching Spotify data for "${entry.song_name}" by "${entry.artist_name}"`);
                     const searchResults = await searchTrack(entry.song_name, token) // fetch track data from Spotify
-                    console.log(`Spotify API response for "${entry.song_name}":`, JSON.stringify(searchResults, null, 2));
 
                     const track = searchResults.tracks.items.find(track =>
                         track.name.toLowerCase() === entry.song_name.toLowerCase() &&
@@ -46,7 +44,6 @@ router.get('/', async(req, res)=> {                             // calling get o
                     }
 
                     // Include album image in the enriched entry
-                    console.log(`Matching track for "${entry.song_name}" by "${entry.artist_name}":`, track);
                     return { ...entry.toJSON(), albumImage: track?.album.images?.[0]?.url || null };
                 } catch (err) {
                     // Log error for missing image and return entry with null image
@@ -67,7 +64,6 @@ router.get('/', async(req, res)=> {                             // calling get o
 
 //POST hall of fame entries
 router.post('/', requireAuth, validateHallEntry, async(req, res)=> {
-    console.log("CSRF Token:", req.headers['x-csrf-token']);
     const { artist_name, song_name } = req.body
 
     try{

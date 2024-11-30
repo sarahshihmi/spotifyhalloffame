@@ -31,8 +31,6 @@ router.get('/callback', async (req, res) => {
     const payload = { id: user.id };
     const appToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    console.log('Generated app token:', appToken); // Debugging
-
     res.redirect(`http://localhost:5173/hall?token=${appToken}`);
   } catch (err) {
     console.error('Error in callback:', err);
@@ -151,7 +149,6 @@ router.get('/search-tracks', async (req, res) => {
 
     // Fetch tracks using Spotify API
     const searchResults = await searchTrack(query, token);
-    console.log("Raw Spotify API response:", JSON.stringify(searchResults, null, 2));
 
     // Filter tracks to ensure they belong to the provided artistId
     const filteredTracks = searchResults.tracks.items.filter((track) =>

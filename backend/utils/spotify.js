@@ -71,7 +71,6 @@ const searchTrack = async (query, token) => {
 
   try {
     const response = await spotifyApi.searchTracks(query);
-    console.log("Raw track response from Spotify:", response.body);
     return response.body;
   } catch (error) {
     console.error("Error in searchTrack utility:", error);

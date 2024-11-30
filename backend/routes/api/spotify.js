@@ -31,10 +31,11 @@ router.get('/callback', async (req, res) => {
     const payload = { id: user.id };
     const appToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    res.redirect(`http://localhost:5173/hall?token=${appToken}`);
+    
+    res.redirect(`/hall?token=${appToken}`);
   } catch (err) {
     console.error('Error in callback:', err);
-    res.redirect('http://localhost:5173/login?error=spotify_auth_failed');
+    res.redirect('/login?error=spotify_auth_failed');
   }
 });
 

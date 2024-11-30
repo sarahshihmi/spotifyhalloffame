@@ -17,6 +17,8 @@ const validateHallEntry = [         //initiate validation object
 
     check('song_name').exists({checkFalsy:true}).isLength({min:1}).withMessage('Song name is required'),        //checking song name exists, has a length of 1, and an error message
 
+    check('artist_id').exists({ checkFalsy: true }).isString().withMessage('Artist ID is required.'),
+
     handleValidationErrors      //call handlevalidationerrors from our validation utility folder
 ]
 
@@ -25,7 +27,8 @@ router.get('/', async(req, res)=> {                             // calling get o
     try{                                                        // initiatetry block
         const hallEntries = await Hall.findAll({                // create the object hallEntries as a result awaiting a find all in Hall model
             where: { user_id: req.user.id },                    // filter out the stuff only for the current user
-            order: [['createdAt', 'DESC']]                      // order is in double array, createdAt, descending.
+            order: [['createdAt', 'DESC']],                      // order is in double array, createdAt, descending.
+            attributes: ['id', 'artist_name', 'song_name', 'artist_id']
         })
         
         const token = req.user.access_token // retrieve the user's access token
@@ -64,7 +67,7 @@ router.get('/', async(req, res)=> {                             // calling get o
 
 //POST hall of fame entries
 router.post('/', requireAuth, validateHallEntry, async(req, res)=> {
-    const { artist_name, song_name } = req.body
+    const { artist_name, artist_id, song_name } = req.body
 
     try{
         // Check for existing entry for the artist
@@ -83,7 +86,8 @@ router.post('/', requireAuth, validateHallEntry, async(req, res)=> {
         const newEntry = await Hall.create({
             user_id: req.user.id,
             artist_name, 
-            song_name
+            artist_id: artist_id,
+            song_name,
         })
 
         
@@ -98,7 +102,8 @@ router.post('/', requireAuth, validateHallEntry, async(req, res)=> {
 //PUT hall of fame entry
 router.put('/:id', validateHallEntry, async(req, res)=>{
     const { id } = req.params
-    const {artist_name, song_name} = req.body
+    const {artist_name, song_name, artist_id} = req.body
+    console.log('Request Body:', req.body);
 
     try{
         const entry = await Hall.findOne({
@@ -109,8 +114,10 @@ router.put('/:id', validateHallEntry, async(req, res)=>{
             return res.status(404).json({ status: 'error', message: 'Hall of Fame entry not found' });
         }
 
-        entry.artist_name = artist_name
-        entry.song_name = song_name
+        if (artist_name) entry.artist_name = artist_name;
+        if (song_name) entry.song_name = song_name;
+        if (artist_id) entry.artist_id = artist_id;
+
         await entry.save()
         res.status(200).json({ status: 'Hall of Fame entry updated successfully', data: entry });
     } catch (err) {

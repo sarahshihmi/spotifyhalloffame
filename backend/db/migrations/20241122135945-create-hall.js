@@ -22,6 +22,10 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: false,
       },
+      artist_id: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       song_name: {
         type: Sequelize.TEXT,
         allowNull: false,

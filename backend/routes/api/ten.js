@@ -8,10 +8,19 @@ const { searchTrack } = require('../../utils/spotify')
 
 router.use(requireAuth);
 
-const validateTenEntry = [
+const validateTenEntryPost = [
     check('artist_name').exists({checkFalsy:true}).isLength({min:1}).withMessage('Artist name is required.'),
+    check('artist_id').exists({ checkFalsy: true }).isString().withMessage('Artist ID is required.'),
     check('song_name').exists({checkFalsy:true}).isLength({min:1}).withMessage('Song name is required'),
-    check('rank').exists({checkFalsy:true}).isInt({min:1, max:15}).withMessage('Rank must be an integer between 1 and 15.'),
+    check('rank').exists({ nullable: true }).isInt({ min: 1, max: 15 }).withMessage('Rank must be an integer between 1 and 15.'), 
+    handleValidationErrors
+]   
+
+const validateTenEntryPut = [
+    check('artist_name').exists({checkFalsy:true}).isLength({min:1}).withMessage('Artist name is required.'),
+    check('artist_id').exists({ checkFalsy: true }).isString().withMessage('Artist ID is required.'),
+    check('song_name').exists({checkFalsy:true}).isLength({min:1}).withMessage('Song name is required'),
+    check('rank').optional({ nullable: true }).isInt({ min: 1, max: 15 }).withMessage('Rank must be an integer between 1 and 15.'), // Optional for PUT
     handleValidationErrors
 ]   
 
@@ -21,6 +30,7 @@ router.get('/', async (req, res) => {
         const tenEntries = await Ten.findAll({
             where: { user_id: req.user.id },
             order: [['rank', 'ASC']],
+            attributes: ['id', 'artist_name', 'song_name', 'artist_id', 'rank']
         });
 
         const token = req.user.access_token; // Retrieve user's access token
@@ -59,11 +69,11 @@ router.get('/', async (req, res) => {
 });
 
 //POST top 10 entries
-router.post('/', validateTenEntry, async (req, res) => {
-    const { artist_name, song_name, rank } = req.body
+router.post('/', validateTenEntryPost, async (req, res) => {
+    const { artist_name, artist_id, song_name, rank } = req.body
 
     if (rank < 1 || rank > 15) {
-        return res.status(400).json({ error: 'Rank must be between 1 and 15.' });
+        return res.status(400).json({ error: 'Rank must be a whole number between 1 and 15.' });
     }
 
     try{
@@ -78,12 +88,17 @@ router.post('/', validateTenEntry, async (req, res) => {
         });
         
         if (rankConflict) {
-            return res.status(400).json({ error: 'This rank is already assigned to another entry.' });
+            return res.status(409).json({ 
+                status: 'conflict',
+                message: `You already have an entry for Rank ${rank}: ${rankConflict.song_name}`,
+                data: rankConflict
+            });
         }
 
         const newEntry = await Ten.create({
             user_id: req.user.id,
             artist_name, 
+            artist_id: artist_id,
             song_name, 
             rank
         })
@@ -95,7 +110,7 @@ router.post('/', validateTenEntry, async (req, res) => {
 })
 
 //PUT top 10 entries
-router.put('/:id', validateTenEntry, async (req, res)=> {
+router.put('/:id', validateTenEntryPut, async (req, res)=> {
     const { id } = req.params
 
     if (isNaN(id)) {
@@ -104,24 +119,19 @@ router.put('/:id', validateTenEntry, async (req, res)=> {
 
     
     try{
-        const { artist_name, song_name, rank } = req.body
+        const { artist_name, artist_id, song_name } = req.body
 
-        const [rankConflict, entry] = await Promise.all([
-            Ten.findOne({ where: { user_id: req.user.id, rank } }),
-            Ten.findOne({ where: { id, user_id: req.user.id } })
-        ]);
+        const entry = await Ten.findOne({ where: { id, user_id: req.user.id } })
         
         if (!entry) {
             return res.status(404).json({ error: 'Top Ten entry does not exist' });
         }
         
-        if (rankConflict && rankConflict.id !== parseInt(id)) {
-            return res.status(400).json({ error: 'This rank is already assigned to another entry.' });
-        }
 
-        entry.artist_name = artist_name
-        entry.song_name = song_name
-        entry.rank = rank
+        if (artist_name) entry.artist_name = artist_name;
+        if (song_name) entry.song_name = song_name;
+        if (artist_id) entry.artist_id = artist_id;
+
         await entry.save()
         return res.status(200).json({message:'Top Ten List entry updated successfully', entry})
     } catch (err) {

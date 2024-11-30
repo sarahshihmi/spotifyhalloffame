@@ -23,6 +23,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: false,
     },
+    artist_id: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     song_name: {
       type: DataTypes.TEXT,
       allowNull: false,

@@ -7,20 +7,24 @@ const getCsrfTokenFromCookie = () => {
 };
 
 const SearchTrack = ({ mode }) => {
-const [searchParams] = useSearchParams();
-const [searchInput, setSearchInput] = useState("");
-const [trackResults, setTrackResults] = useState([]);
-const [selectedTrack, setSelectedTrack] = useState(null);
-const [existingEntry, setExistingEntry] = useState(null); // Track existing entry
-const [showConfirmation, setShowConfirmation] = useState(false); // Toggle confirmation screen
-  
-const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [searchInput, setSearchInput] = useState("");
+  const [trackResults, setTrackResults] = useState([]);
+  const [searchPerformed, setSearchPerformed] = useState(false); 
+  const [selectedTrack, setSelectedTrack] = useState(null);
+  const [existingEntry, setExistingEntry] = useState(null); // Track existing entry
+  const [conflictingEntry, setConflictingEntry] = useState(null); // Track conflicting entry for ten
+  const [showConfirmation, setShowConfirmation] = useState(false); // Toggle confirmation screen
+  mode = searchParams.get("mode") || "hall";
 
-const artistId = searchParams.get("artistId");
+  const navigate = useNavigate();
 
+  const artistId = searchParams.get("artistId");
+  const entryId = searchParams.get("entryId"); // Retrieve entryId if editing
 
-const handleSearch = async () => {
+  const handleSearch = async () => {
     try {
+      setSearchPerformed(true); 
       const response = await fetch(
         `/api/spotify/search-tracks?query=${searchInput}&artistId=${artistId}`,
         {
@@ -32,7 +36,7 @@ const handleSearch = async () => {
       if (!response.ok) {
         if (response.status === 404) {
           console.warn("No tracks found");
-          setTrackResults([]); // Show empty results instead of crashing
+          setTrackResults([]);
         } else {
           throw new Error("Failed to fetch tracks");
         }
@@ -49,14 +53,11 @@ const handleSearch = async () => {
     setSelectedTrack(trackId);
   };
 
-mode = searchParams.get("mode") || "hall"; // Fallback to "hall" if no mode
-
-
   const handleConfirmSelection = async () => {
     try {
       const selected = trackResults.find((track) => track.id === selectedTrack);
       const token = localStorage.getItem("token");
-  
+
       if (!token) {
         console.error("No token found in localStorage");
         throw new Error("Authorization token missing");
@@ -65,19 +66,26 @@ mode = searchParams.get("mode") || "hall"; // Fallback to "hall" if no mode
       const body = {
         artist_name: selected.artists[0].name,
         song_name: selected.name,
+        artist_id: selected.artists[0].id,
       };
 
-      if (mode === "ten") {
+      let endpoint = `/api/${mode}`;
+      let method = "POST";
+
+      if (mode === "ten-edit" && entryId) {
+        endpoint = `/api/ten/${entryId}`;
+        method = "PUT";
+      } else if (mode === "ten") {
         const rank = prompt("Enter the rank for this song (1-15):");
-        if (!rank || isNaN(rank) || rank < 1 || rank > 15) {
-          alert("Invalid rank! Please enter a number between 1 and 15.");
+        if (!rank || isNaN(rank) || rank < 1 || rank > 15 || !Number.isInteger(Number(rank))) {
+          alert("Invalid rank! Please enter a whole number between 1 and 15.");
           return;
         }
         body.rank = parseInt(rank, 10);
       }
-  
-      const response = await fetch(`/api/${mode}`, {
-        method: "POST",
+
+      const response = await fetch(endpoint, {
+        method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -85,23 +93,32 @@ mode = searchParams.get("mode") || "hall"; // Fallback to "hall" if no mode
         },
         body: JSON.stringify(body),
       });
-  
-      if (response.status === 409 && mode === "hall") {
+
+      if (response.status === 409) {
         const data = await response.json();
-        setExistingEntry(data.data); // Capture existing entry data
-        setShowConfirmation(true); // Show confirmation screen
+        if (mode === "ten") {
+          setConflictingEntry(data.data); // For ten, capture conflicting rank entry
+        } else if (mode === "hall") {
+          setExistingEntry(data.data); // For hall, capture conflicting hall entry
+        }
+        setShowConfirmation(true);
         return;
       }
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Error response:", errorData);
         throw new Error("Failed to add entry");
       }
-  
-      navigate(`/${mode}`);
+
+      navigate(`/${mode === "ten-edit" ? "ten" : mode}`);
     } catch (err) {
-      console.error(`Error adding track to ${mode === "hall" ? "Hall of Fame" : "Top Ten List"}:`, err);
+      console.error(
+        `Error adding track to ${
+          mode === "hall" ? "Hall of Fame" : "Top Ten List"
+        }:`,
+        err
+      );
     }
   };
 
@@ -110,7 +127,12 @@ mode = searchParams.get("mode") || "hall"; // Fallback to "hall" if no mode
       const selected = trackResults.find((track) => track.id === selectedTrack);
       const token = localStorage.getItem("token");
 
-      const response = await fetch(`/api/hall/${existingEntry.id}`, {
+      let endpoint = `/api/hall/${existingEntry?.id}`;
+      if (mode === "ten" && conflictingEntry) {
+        endpoint = `/api/ten/${conflictingEntry.id}`;
+      }
+
+      const response = await fetch(endpoint, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -120,21 +142,25 @@ mode = searchParams.get("mode") || "hall"; // Fallback to "hall" if no mode
         body: JSON.stringify({
           artist_name: selected.artists[0].name,
           song_name: selected.name,
+          artist_id: selected.artists[0].id,
+          rank: conflictingEntry?.rank || undefined, // Include rank for ten
         }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to overwrite Hall of Fame entry");
+        throw new Error("Failed to overwrite entry");
       }
 
-      navigate("/hall");
+      navigate(mode === "hall" ? "/hall" : "/ten");
     } catch (err) {
-      console.error("Error overwriting Hall of Fame entry:", err);
+      console.error("Error overwriting entry:", err);
     }
   };
 
   const handleKeepEntry = () => {
     setShowConfirmation(false); // Close confirmation screen
+    setConflictingEntry(null); // Reset conflicting entry
+    setExistingEntry(null); // Reset existing entry
   };
 
   return (
@@ -150,38 +176,52 @@ mode = searchParams.get("mode") || "hall"; // Fallback to "hall" if no mode
 
       {showConfirmation ? (
         <div>
-          <p>
-            You already have <b>{existingEntry.song_name}</b> as your <b>{existingEntry.artist_name}</b> entry.
-          </p>
+          {conflictingEntry ? (
+            <p>
+              You currently have <b>{conflictingEntry.song_name}</b> as Rank{" "}
+              <b>{conflictingEntry.rank}</b>.
+            </p>
+          ) : (
+            <p>
+              You currently have <b>{existingEntry.song_name}</b> as your{" "}
+              <b>{existingEntry.artist_name}</b> entry.
+            </p>
+          )}
           <button onClick={handleOverwrite}>Change it.</button>
           <button onClick={handleKeepEntry}>Keep it.</button>
         </div>
       ) : (
         <div>
-          {trackResults.length > 0 ? (
-            trackResults.map((track) => (
-              <div
-                key={track.id}
-                onClick={() => handleSelectTrack(track.id)}
-                style={{
-                  border: track.id === selectedTrack ? "2px solid gold" : "1px solid gray",
-                  padding: "10px",
-                  marginBottom: "10px",
-                }}
-              >
-                <img src={track.album.images?.[0]?.url} alt={track.name} width={50} height={50} />
-                <p>{track.name}</p>
-              </div>
-            ))
-          ) : (
-            <p>No results found. Try a different search term!</p>
-          )}
-          {selectedTrack && (
-            <button onClick={handleConfirmSelection} style={{ marginTop: "20px" }}>
-              Confirm Selection
-            </button>
-          )}
-        </div>
+        {searchPerformed && trackResults.length === 0 && (
+          <p>No results found. Try a different search term!</p>
+        )}
+        {trackResults.length > 0 &&
+          trackResults.map((track) => (
+            <div
+              key={track.id}
+              onClick={() => handleSelectTrack(track.id)}
+              style={{
+                border:
+                  track.id === selectedTrack ? "2px solid gold" : "1px solid gray",
+                padding: "10px",
+                marginBottom: "10px",
+              }}
+            >
+              <img
+                src={track.album.images?.[0]?.url}
+                alt={track.name}
+                width={50}
+                height={50}
+              />
+              <p>{track.name}</p>
+            </div>
+          ))}
+        {selectedTrack && (
+          <button onClick={handleConfirmSelection} style={{ marginTop: "20px" }}>
+            Confirm Selection
+          </button>
+        )}
+      </div>
       )}
     </div>
   );

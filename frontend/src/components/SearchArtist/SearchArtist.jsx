@@ -7,6 +7,7 @@ const SearchArtist = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams(); // Retrieve query parameters
   const mode = searchParams.get("mode") || "hall"; 
+  const entryId = searchParams.get("entryId");
 
   const handleSearch = async () => {
     try {
@@ -24,7 +25,7 @@ const SearchArtist = () => {
   };
 
   const handleSelectArtist = (artistId) => {
-    navigate(`/search-track?artistId=${artistId}&mode=${mode}`);
+    navigate(`/search-track?artistId=${artistId}&mode=${mode}${entryId ? `&entryId=${entryId}` : ""}`)
   };
 
   return (

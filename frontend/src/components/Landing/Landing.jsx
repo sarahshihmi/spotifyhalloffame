@@ -1,5 +1,5 @@
 import './Landing.css';
-import myHeadshot from '../../../dist/assets/sarahpic1.jpg'
+import myHeadshot from '../../assets/sarahpic.jpg'
 import { FaGithub, FaSpotify, FaLinkedin } from 'react-icons/fa';
 
 const Landing = () => {

@@ -1,40 +1,67 @@
-/* */
-.navbar {
+.navBar {
     display: flex;
-    justify-content: space-between; /* space out 3 sections */
-    align-items: center;  /* */
-    padding: 10px 20px;
-    background-color: #242424;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    position: relative;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .left-bar {
     display: flex;
     align-items: center;
+    gap: 20px;
 }
 
 .center-bar {
     display: flex;
-    gap: 20px; /* Space between links */
     align-items: center;
+    gap: 20px;
+    flex-grow: 1;
     justify-content: center;
-    flex: 1; /* Push this section to the center */
 }
 
 .right-bar {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
 }
 
 .nav-logo-icon {
-    height: 40px; /* Adjust based on desired size */
-    cursor: pointer; /* Make it clickable */
+    height: 50px;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.nav-link {
+    font-size: 20px;
+    text-decoration: none;
+    color: #f8c384;
+    padding: 10px 20px;
+    border: 2px solid #f8c384;
+    border-radius: 10px;
+    background-color: transparent;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    background-color: #f8c384;
+    color: #242424;
 }
 
 .profile-button {
     display: flex;
     align-items: center;
-    cursor: pointer; /* Indicate it's clickable */
+    justify-content: center;
+    height: 50px;
+    width: 50px;
+    font-size: 20px;
+    color: #f8c384;
+    border: 2px solid #f8c384;
+    border-radius: 15px;
+    background-color: transparent;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.profile-button:hover {
+    background-color: #f8c384;
+    color: #242424;
 }

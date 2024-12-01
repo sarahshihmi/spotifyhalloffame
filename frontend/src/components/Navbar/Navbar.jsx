@@ -1,14 +1,13 @@
 import { NavLink } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import ProfileButton from './ProfileButton';
-import spotifyhoflogo from "../../assets/spotifyhoflogo.png"
+import spotifyhoflogo from "../../assets/spotifyhoflogo.png";
 import './Navbar.css';
 
-function Navbar({isLoaded}) {
-    //session user from redux store:
-    const sessionUser = useSelector(state => state.session.user)
+function Navbar({ isLoaded }) {
+    const sessionUser = useSelector(state => state.session.user);
 
-    return(
+    return (
         <nav className="navBar">
             <div className="left-bar">
                 <NavLink to="/">
@@ -20,18 +19,14 @@ function Navbar({isLoaded}) {
                 </NavLink>
             </div>
 
-            {isLoaded && (
+            {isLoaded && sessionUser && (
                 <div className="center-bar">
-                    {sessionUser && (
-                        <div className="center-bar">
-                            <NavLink to="/hall" className="hall-link">
-                                Hall of Fame
-                            </NavLink>
-                            <NavLink to="/ten" className="ten-link">
-                                Top 10
-                            </NavLink>
-                        </div>
-                    )}
+                    <NavLink to="/hall" className="nav-link">
+                        Hall of Fame
+                    </NavLink>
+                    <NavLink to="/ten" className="nav-link">
+                        Top 10
+                    </NavLink>
                 </div>
             )}
 
@@ -41,11 +36,7 @@ function Navbar({isLoaded}) {
                 </div>
             </div>
         </nav>
-    )
+    );
 }
-
-
-
-
 
 export default Navbar;

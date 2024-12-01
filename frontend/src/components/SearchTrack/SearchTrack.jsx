@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import './SearchTrack.css'
 
 const getCsrfTokenFromCookie = () => {
   const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
@@ -164,66 +165,83 @@ const SearchTrack = ({ mode }) => {
   };
 
   return (
-    <div>
-      <h2>Select a Song</h2>
-      <input
-        type="text"
-        placeholder="Enter song name"
-        value={searchInput}
-        onChange={(e) => setSearchInput(e.target.value)}
-      />
-      <button onClick={handleSearch}>Search</button>
-
-      {showConfirmation ? (
-        <div>
-          {conflictingEntry ? (
-            <p>
-              You currently have <b>{conflictingEntry.song_name}</b> as Rank{" "}
-              <b>{conflictingEntry.rank}</b>.
-            </p>
-          ) : (
-            <p>
-              You currently have <b>{existingEntry.song_name}</b> as your{" "}
-              <b>{existingEntry.artist_name}</b> entry.
-            </p>
-          )}
-          <button onClick={handleOverwrite}>Change it.</button>
-          <button onClick={handleKeepEntry}>Keep it.</button>
-        </div>
-      ) : (
-        <div>
-        {searchPerformed && trackResults.length === 0 && (
-          <p>No results found. Try a different search term!</p>
+    <div className="search-track-container">
+    <div className="search-track-header">Select a Song</div>
+    <input
+      type="text"
+      className="search-track-input"
+      placeholder="Enter song name"
+      value={searchInput}
+      onChange={(e) => setSearchInput(e.target.value)}
+    />
+    <button
+      onClick={handleSearch}
+      className={`search-track-button ${!searchInput ? "disabled" : ""}`}
+      disabled={!searchInput}
+    >
+      Search
+    </button>
+  
+    {showConfirmation ? (
+      <div className="search-track-confirmation">
+        {conflictingEntry ? (
+          <div>
+            You currently have <b>{conflictingEntry.song_name}</b> as Rank{" "}
+            <b>{conflictingEntry.rank}</b>.
+          </div>
+        ) : (
+          <div>
+            You currently have <b>{existingEntry.song_name}</b> as your{" "}
+            <b>{existingEntry.artist_name}</b> entry.
+          </div>
         )}
-        {trackResults.length > 0 &&
-          trackResults.map((track) => (
-            <div
-              key={track.id}
-              onClick={() => handleSelectTrack(track.id)}
-              style={{
-                border:
-                  track.id === selectedTrack ? "2px solid gold" : "1px solid gray",
-                padding: "10px",
-                marginBottom: "10px",
-              }}
-            >
-              <img
-                src={track.album.images?.[0]?.url}
-                alt={track.name}
-                width={50}
-                height={50}
-              />
-              <p>{track.name}</p>
-            </div>
-          ))}
-        {selectedTrack && (
-          <button onClick={handleConfirmSelection} style={{ marginTop: "20px" }}>
-            Confirm Selection
-          </button>
+        <button className="search-track-confirmation-button" onClick={handleOverwrite}>
+          Change it.
+        </button>
+        <button className="search-track-confirmation-button" onClick={handleKeepEntry}>
+          Keep it.
+        </button>
+      </div>
+    ) : (
+      <div className="search-track-results">
+        {searchPerformed && trackResults.length === 0 ? (
+          <p className="no-results-message">No results found. Try a different search term!</p>
+        ) : (
+          <>
+            {trackResults.map((track) => (
+              <div
+                key={track.id}
+                className={`search-track-card ${
+                  track.id === selectedTrack ? "selected" : ""
+                }`}
+                onClick={() => handleSelectTrack(track.id)}
+              >
+                <img
+                  src={track.album.images?.[0]?.url}
+                  alt={track.name}
+                  className="search-track-image"
+                />
+                <p className="search-track-name">{track.name}</p>
+              </div>
+            ))}
+            {/* Show confirm button only if there has been a search and a track is selected */}
+            {searchPerformed && selectedTrack && (
+              <button
+                className={`search-track-confirm-button ${
+                  !selectedTrack ? "disabled" : ""
+                }`}
+                onClick={handleConfirmSelection}
+                disabled={!selectedTrack}
+              >
+                Confirm Selection
+              </button>
+            )}
+          </>
         )}
       </div>
-      )}
-    </div>
+    )}
+  </div>
+  
   );
 };
 

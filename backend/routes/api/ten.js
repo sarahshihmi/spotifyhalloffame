@@ -37,9 +37,7 @@ router.get('/', async (req, res) => {
         const enrichedEntries = await Promise.all(
             tenEntries.map(async (entry) => {
                 try {
-                    console.log(`Fetching Spotify data for "${entry.song_name}" by "${entry.artist_name}"`);
                     const searchResults = await searchTrack(entry.song_name, token); // Fetch track data from Spotify
-                    console.log(`Spotify API response for "${entry.song_name}":`, JSON.stringify(searchResults, null, 2));
 
                     const track = searchResults.tracks.items.find(
                         (track) =>
@@ -52,7 +50,6 @@ router.get('/', async (req, res) => {
                     }
 
                     // Include album image in the enriched entry
-                    console.log(`Matching track for "${entry.song_name}" by "${entry.artist_name}":`, track);
                     return { ...entry.toJSON(), albumImage: track?.album.images?.[0]?.url || null };
                 } catch (err) {
                     console.error(`Error fetching image for song "${entry.song_name}":`, err);

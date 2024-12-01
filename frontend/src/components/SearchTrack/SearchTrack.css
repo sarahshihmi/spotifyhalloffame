@@ -1,0 +1,156 @@
+.search-track-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    font-family: "Jost", sans-serif;
+    background-color: #242424;
+    min-height: 100vh;
+  }
+  
+  .search-track-header {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #f8c384;
+  }
+  
+  .search-track-input {
+    width: 80%;
+    max-width: 400px;
+    padding: 10px;
+    font-size: 1.2rem;
+    border: 2px solid #f8c384;
+    border-radius: 5px;
+    margin-bottom: 20px;
+  }
+  
+  .search-track-button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: #242424;
+    background-color: #f8c384;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 30px;
+  }
+  
+  .search-track-button.disabled {
+    background-color: #555;
+    color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .search-track-results {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 80%;
+  }
+  
+  .search-track-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px;
+    border: 2px solid #f8c384;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .search-track-card:hover {
+    background-color: #333;
+  }
+  
+  .search-track-card.selected {
+    background-color: rgba(255, 215, 0, 0.2);
+    border-color: #f8c384;
+  }
+  
+  .search-track-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+    object-fit: cover;
+  }
+  
+  .search-track-name {
+    font-size: 1.2rem;
+    color: #f8c384;
+  }
+  
+  .search-track-confirm-button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: #242424;
+    background-color: #f8c384;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: all 0.3s ease;
+  }
+  
+  .search-track-confirm-button:hover {
+    background-color: #e0a96d;
+  }
+  
+  .search-track-confirm-button.disabled {
+    background-color: #555;
+    color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .no-results-message {
+    color: #fff; 
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  .search-track-confirmation {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    color:white;
+    border-radius: 10px;
+    border: 2px solid red; 
+  }
+  
+  .search-track-confirmation p {
+    color: white; 
+    font-size: 1.2rem;
+    text-align: center;
+    margin: 0;
+  }
+  
+  .search-track-confirmation-button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .search-track-confirmation-button:first-of-type {
+    background-color: #f8c384; 
+    color: #242424; 
+  }
+  
+  .search-track-confirmation-button:first-of-type:hover {
+    background-color: #e0a96d;
+  }
+  
+  .search-track-confirmation-button:last-of-type {
+    background-color: #555; 
+    color: #ccc;
+  }
+  
+  .search-track-confirmation-button:last-of-type:hover {
+    background-color: #666;
+  }
+  

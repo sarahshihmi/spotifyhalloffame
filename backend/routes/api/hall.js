@@ -103,8 +103,6 @@ router.post('/', requireAuth, validateHallEntry, async(req, res)=> {
 router.put('/:id', validateHallEntry, async(req, res)=>{
     const { id } = req.params
     const {artist_name, song_name, artist_id} = req.body
-    console.log('Request Body:', req.body);
-
     try{
         const entry = await Hall.findOne({
             where: { id, user_id: req.user.id },

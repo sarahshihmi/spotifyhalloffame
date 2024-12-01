@@ -1,0 +1,90 @@
+.search-artist-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    font-family: "Jost", sans-serif;
+    background-color: #242424;
+    min-height: 100vh;
+  }
+  
+  .search-artist-header {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #f8c384;
+  }
+  
+  .search-artist-input {
+    width: 80%;
+    max-width: 400px;
+    padding: 10px;
+    font-size: 1.2rem;
+    border: 2px solid #f8c384;
+    border-radius: 5px;
+    margin-bottom: 20px;
+  }
+  
+  .search-artist-button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: #242424;
+    background-color: #f8c384;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 30px;
+  }
+  
+  .search-artist-button:hover {
+    background-color: #e0a96d;
+  }
+  
+  .search-artist-results {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 80%;
+  }
+  
+  .search-artist-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px;
+    border: 2px solid #f8c384;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .search-artist-card:hover {
+    background-color: #333;
+  }
+  
+  .search-artist-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+    object-fit: cover;
+  }
+  
+  .search-artist-name {
+    font-size: 1.2rem;
+    color: #f8c384;
+  }
+  
+
+  .search-artist-button.disabled {
+    background-color: #555; /* Greyed-out background */
+    color: #ccc; 
+    cursor: not-allowed;
+  }
+  
+  .search-artist-button:disabled {
+    background-color: #555; 
+    color: #ccc; 
+    cursor: not-allowed; 
+  }
+
+  

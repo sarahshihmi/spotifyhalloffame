@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import { useSelector } from "react-redux";
 import { useSearchParams } from 'react-router-dom';
 import { loginSpotifyUser } from '../../store/session';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import './Ten.css';
 const Ten = () => {
     const dispatch = useDispatch() // hook to dispatch actions to the store to update state
@@ -11,6 +11,8 @@ const Ten = () => {
     const sessionUser = useSelector ((state) => state.session.user)
     const [songs, setSongs] = useState([]); // State to store songs
     const [isEditing, setIsEditing] = useState(false);
+
+    const navigate = useNavigate();
 
     const getCsrfTokenFromCookie = () => {
       const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/); // Match the CSRF token from cookies
@@ -88,70 +90,167 @@ const Ten = () => {
         }
       };
 
-      console.log(songs)
-      return (
-        <div className="ten-container">
-            <header className="ten-header">
-                <h1>The Top Ten List</h1>
-                <p>
-                    By {sessionUser.display_name}
-                </p>
-            </header>
+  return (
+    <div className="ten-container">
+    <header className="ten-header">
+      <h1>The Top Ten List</h1>
+      <p>Curated by {sessionUser.display_name}</p>
+    </header>
 
-            <div className="ten-actions">
-                <button className = "sort-button">Sort</button>
-                <NavLink to ='/search-artist?mode=ten' className="add-button">Add</NavLink>
-            </div>
-            <button className="edit-button" onClick={() => setIsEditing(!isEditing)}>
-          {isEditing ? "Done" : "Edit"}
-          </button>
+    <div className="ten-actions">
+      <NavLink to="/search-artist?mode=ten" className="ten-add-button">
+        Add
+      </NavLink>
+      <button
+        className="ten-edit-button"
+        onClick={() => setIsEditing(!isEditing)}
+      >
+        {isEditing ? "Done" : "Edit"}
+      </button>
+    </div>
 
-            <div className="ten-grid">
-                {songs.length === 0 ? (
-                    <p>No songs added yet. Click Add to start!</p>
-                ) : (
-                    songs.map((song)=> (
-                        <div key={song.id} className="song-card">
-                            {song.albumImage ? (
-                                <img
-                                    src={song.albumImage}
-                                    alt={`${song.song_name} Album Cover`}
-                                    className="album-art"
-                                />
-                            ) : (
-                                <div className="album-art-placeholder">No Image</div>
-                            )}
-                             <p className="artist-name">{song.artist_name}</p>
-                            <p className="song-title">{song.song_name}</p>
-                            <p className="rank">  {song.rank === 1 
-                                ? "The Best All-Time Song" 
-                                : song.rank >= 2 && song.rank <= 10 
-                                ? `${song.rank}${getSuffix(song.rank)} place` 
-                                : "Honorable Mention"}
-                              </p>
-
-                            {isEditing && (
-                    <div className="edit-actions">
-                      <NavLink
-                        to={`/search-artist?mode=ten-edit&entryId=${song.id}`}
-                        className="add-button"
+    <div className="ten-grid">
+      {[1, 2, 3, 4, 5, 6].map((rank) => (
+        <div className="ten-song-card" key={rank}>
+          {songs.find((song) => song.rank === rank) ? (
+            songs
+              .filter((song) => song.rank === rank)
+              .map((song) => (
+                <div key={song.id}>
+                  {song.albumImage ? (
+                    <img
+                      src={song.albumImage}
+                      alt={`${song.song_name} Album Cover`}
+                      className="ten-album-art"
+                    />
+                  ) : (
+                    <div className="ten-album-art-placeholder">No Image</div>
+                  )}
+                  <p className="ten-artist-name">{song.artist_name}</p>
+                  <p className="ten-song-title">{song.song_name}</p>
+                  <p className="ten-rank">
+                    {rank === 1
+                      ? "The All-Time Best Song"
+                      : `${rank}${getSuffix(rank)} Place`}
+                  </p>
+                  {isEditing && (
+                    <div className="ten-edit-actions">
+                      <button
+                        className="ten-change-button"
+                        onClick={() =>
+                          navigate(
+                            `/search-artist?mode=ten-edit&entryId=${song.id}`
+                          )
+                        }
                       >
                         Change
-                      </NavLink>
+                      </button>
                       <button
-                        className="delete-button"
+                        className="ten-delete-button"
                         onClick={() => handleDelete(song.id)}
                       >
                         Delete
                       </button>
                     </div>
                   )}
-                        </div>
-                    ))
-                )}
+                </div>
+              ))
+          ) : (
+            <div className="ten-placeholder">
+              Waiting for {rank === 1
+                ? "First Place Song"
+                : `${rank}${getSuffix(rank)} Place Song`}
             </div>
+          )}
         </div>
-      )
-};
+      ))}
+    </div>
+
+    <div className="ten-row-last">
+      {[7, 8, 9, 10].map((rank) => (
+        <div className="ten-song-card" key={rank}>
+          {songs.find((song) => song.rank === rank) ? (
+            songs
+              .filter((song) => song.rank === rank)
+              .map((song) => (
+                <div key={song.id}>
+                  {song.albumImage ? (
+                    <img
+                      src={song.albumImage}
+                      alt={`${song.song_name} Album Cover`}
+                      className="ten-album-art"
+                    />
+                  ) : (
+                    <div className="ten-album-art-placeholder">No Image</div>
+                  )}
+                  <p className="ten-artist-name">{song.artist_name}</p>
+                  <p className="ten-song-title">{song.song_name}</p>
+                  <p className="ten-rank">
+                    {`${rank}${getSuffix(rank)} Place`}
+                  </p>
+                  {isEditing && (
+                    <div className="ten-edit-actions">
+                      <button
+                        className="ten-change-button"
+                        onClick={() =>
+                          navigate(
+                            `/search-artist?mode=ten-edit&entryId=${song.id}`
+                          )
+                        }
+                      >
+                        Change
+                      </button>
+                      <button
+                        className="ten-delete-button"
+                        onClick={() => handleDelete(song.id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))
+          ) : (
+            <div className="ten-placeholder">
+              Waiting for {`${rank}${getSuffix(rank)} Place Song`}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+
+    <div className="ten-honorable-mentions">
+      <div className="ten-honorable-mention-title">Honorable Mentions</div>
+      {songs
+        .filter((song) => song.rank > 10)
+        .map((song) => (
+          <p key={song.id}>
+            {song.artist_name} - {song.song_name}
+            {isEditing && (
+                    <div className="ten-edit-actions">
+                      <button
+                        className="ten-change-button"
+                        onClick={() =>
+                          navigate(
+                            `/search-artist?mode=ten-edit&entryId=${song.id}`
+                          )
+                        }
+                      >
+                        Change
+                      </button>
+                      <button
+                        className="ten-delete-button"
+                        onClick={() => handleDelete(song.id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  )}
+          </p>
+        ))}
+    </div>
+  </div>
+  );
+}
 
 export default Ten;

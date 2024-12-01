@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import './SearchArtist.css'
 
 const SearchArtist = () => {
   const [searchInput, setSearchInput] = useState("");
@@ -29,24 +30,38 @@ const SearchArtist = () => {
   };
 
   return (
-    <div>
-      <h2>Select an Artist</h2>
-      <input
-        type="text"
-        placeholder="Enter artist name"
-        value={searchInput}
-        onChange={(e) => setSearchInput(e.target.value)}
-      />
-      <button onClick={handleSearch}>Search</button>
-      <div>
-        {artistResults.map((artist) => (
-          <div key={artist.id} onClick={() => handleSelectArtist(artist.id)}>
-            <img src={artist.images?.[0]?.url} alt={artist.name} width={50} height={50} />
-            <p>{artist.name}</p>
-          </div>
-        ))}
-      </div>
+    <div className="search-artist-container">
+    <div className="search-artist-header">Select an Artist</div>
+    <input
+      type="text"
+      className="search-artist-input"
+      placeholder="Enter artist name"
+      value={searchInput}
+      onChange={(e) => setSearchInput(e.target.value)}
+    />
+    <button         
+        className={`search-artist-button ${!searchInput && "disabled"}`}
+        onClick={handleSearch}
+        disabled={!searchInput}>
+      Search
+    </button>
+    <div className="search-artist-results">
+      {artistResults.map((artist) => (
+        <div
+          key={artist.id}
+          className="search-artist-card"
+          onClick={() => handleSelectArtist(artist.id)}
+        >
+          <img
+            src={artist.images?.[0]?.url}
+            alt={artist.name}
+            className="search-artist-image"
+          />
+          <p className="search-artist-name">{artist.name}</p>
+        </div>
+      ))}
     </div>
+  </div>
   );
 };
 

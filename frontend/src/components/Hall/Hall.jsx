@@ -4,6 +4,8 @@ import { useSelector } from "react-redux";
 import { useSearchParams } from 'react-router-dom';
 import { loginSpotifyUser } from '../../store/session';
 import { NavLink, useNavigate } from 'react-router-dom';
+import './Hall.css'
+
 
 const Hall = () => {
   const dispatch = useDispatch();
@@ -87,13 +89,12 @@ const Hall = () => {
     <div className="hall-container">
       <header className="hall-header">
         <h1>The Spotify Hall of Fame</h1>
-        <p>
-          By {sessionUser.display_name}
-        </p>
+        <div>
+          Curated by {sessionUser.display_name}
+        </div>
       </header>
 
       <div className="hall-actions">
-        <button className="sort-button">Sort</button>
         <NavLink to="/search-artist?mode=hall" className="add-button">
           Add
         </NavLink>
@@ -115,12 +116,11 @@ const Hall = () => {
                   className="album-art"
                 />
               ) : (
-                <div className="album-art-placeholder">No Image</div>
+                <div className="album-art-placeholder">Image Unavaliable!</div>
               )}
               <p className="artist-name">{song.artist_name}</p>
               <p className="song-title">{song.song_name}</p>
 
-              {/* Conditionally show the Change and Delete buttons in Edit mode */}
               {isEditing && (
                 <div className="edit-actions">
                   <button

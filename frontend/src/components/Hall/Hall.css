@@ -118,8 +118,6 @@ h1 {
 }
 
 .change-button, .delete-button {
-    width: 150px; /* Explicit width */
-    height: 30px; /* Explicit height */
     padding: 5px 10px;
     font-size: 0.9rem;
     background-color: #f8c384;
@@ -128,8 +126,6 @@ h1 {
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease, color 0.3s ease;
-    justify-content: center;
-    align-items: center;
 }
 
 .change-button:hover, .delete-button:hover {

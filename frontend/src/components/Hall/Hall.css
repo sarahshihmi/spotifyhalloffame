@@ -35,6 +35,8 @@ h1 {
 
 .add-button, .edit-button {
     font-size: 20px;
+    width: 150px; /* Explicit width */
+    height: 50px; /* Explicit height */
     padding: 10px 30px;
     background-color: #f8c384;
     color: black;
@@ -43,7 +45,13 @@ h1 {
     cursor: pointer;
     margin-top: 20px;
     transition: all 0.3s ease;
+    text-decoration: none; /*navlink issue*/
+    display: inline-flex;
+    box-sizing: border-box; /* Consistent sizing for both */
+    justify-content: center;
+    align-items: center;
 }
+
 
 .add-button:hover, .edit-button:hover {
     background-color: #e0a96d;
@@ -110,6 +118,8 @@ h1 {
 }
 
 .change-button, .delete-button {
+    width: 150px; /* Explicit width */
+    height: 30px; /* Explicit height */
     padding: 5px 10px;
     font-size: 0.9rem;
     background-color: #f8c384;
@@ -118,6 +128,8 @@ h1 {
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease, color 0.3s ease;
+    justify-content: center;
+    align-items: center;
 }
 
 .change-button:hover, .delete-button:hover {

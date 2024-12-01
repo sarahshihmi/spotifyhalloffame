@@ -36,13 +36,21 @@ h1 {
 
 .ten-add-button, .ten-edit-button {
     font-size: 20px;
+    width: 150px; /* Explicit width */
+    height: 50px; /* Explicit height */
     padding: 10px 30px;
     background-color: #f8c384;
     color: black;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    margin-top: 20px;
     transition: all 0.3s ease;
+    text-decoration: none; /*navlink issue*/
+    display: inline-flex;
+    box-sizing: border-box; /* Consistent sizing for both */
+    justify-content: center;
+    align-items: center;
 }
 
 .ten-add-button:hover, .ten-edit-button:hover {

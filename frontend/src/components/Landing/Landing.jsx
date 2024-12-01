@@ -12,8 +12,11 @@ const Landing = () => {
                 <button className="landing-button"onClick={() => (window.location.href = '/api/spotify/login')}>Enter now</button>
             </div>
 
+            <div className="landing-disclaimer">Here for a demo? Please authenticate using sarahashih+dummytester@gmail.com with the password "HallOfFameTester!"</div>
+
 
             <hr className="landing-divider" />
+
 
 
             <div className="landing-mid">

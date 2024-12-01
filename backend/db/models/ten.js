@@ -43,6 +43,13 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Ten',
+    indexes: [
+      {
+        unique: true,
+        fields: ["user_id", "rank"], // Composite unique constraint
+      },
+    ],
+    
   });
   return Ten;
 };

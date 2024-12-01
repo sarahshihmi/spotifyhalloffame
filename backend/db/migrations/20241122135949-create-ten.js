@@ -2,6 +2,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
+    // Create the Tens table
     await queryInterface.createTable('Tens', {
       id: {
         allowNull: false,
@@ -21,7 +22,6 @@ module.exports = {
       rank: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        unique: true,
       },
       artist_name: {
         type: Sequelize.TEXT,
@@ -44,8 +44,16 @@ module.exports = {
         type: Sequelize.DATE,
       },
     });
+
+    // Add a composite unique constraint on user_id and rank
+    await queryInterface.addConstraint('Tens', {
+      fields: ['user_id', 'rank'], // Columns for the unique constraint
+      type: 'unique', // Type of constraint
+      name: 'unique_user_rank', // Name of the constraint
+    });
   },
   async down(queryInterface, Sequelize) {
+    // Drop the Tens table
     await queryInterface.dropTable('Tens');
-  }
+  },
 };

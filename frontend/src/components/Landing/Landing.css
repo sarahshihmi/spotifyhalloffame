@@ -39,6 +39,13 @@
     background-color: #e0a96d;
 }
 
+.landing-disclaimer{
+    color:red;
+    font-size:20px;
+    text-align:center;
+    font-style: italic;
+}
+
 .landing-divider {
     border: 1px solid grey;
     margin: 40px 0;
@@ -88,6 +95,7 @@
     font-weight: bold;
     color: #2C2C54;
     display: inline-block;
+    object-fit:cover;
 }
 
 .landing-about-head {

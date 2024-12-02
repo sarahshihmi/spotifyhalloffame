@@ -58,6 +58,9 @@
     border-radius: 5px;
     cursor: pointer;
     transition: all 0.3s ease;
+    position: relative;
+    margin: 10px;
+    text-align: center;
   }
   
   .search-track-card:hover {
@@ -82,19 +85,19 @@
   }
   
   .search-track-confirm-button {
-    padding: 10px 20px;
-    font-size: 1rem;
-    color: #242424;
+    margin-top: 10px;
+    margin-left: 10px;
+    padding: 8px 12px;
     background-color: #f8c384;
+    color: #242424;
     border: none;
-    border-radius: 5px;
+    border-radius: 4px;
     cursor: pointer;
-    margin-top: 20px;
-    transition: all 0.3s ease;
   }
-  
+
   .search-track-confirm-button:hover {
-    background-color: #e0a96d;
+    background-color: #fff;
+    color: #f8c384;
   }
   
   .search-track-confirm-button.disabled {

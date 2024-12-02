@@ -273,19 +273,19 @@ const SearchTrack = ({ mode }) => {
                     className="search-track-image"
                   />
                   <p className="search-track-name">{track.name}</p>
+                  {track.id === selectedTrack && (
+                    <button
+                      className="search-track-confirm-button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleConfirmSelection();
+                      }}
+                    >
+                      Confirm Selection
+                    </button>
+                  )}
                 </div>
               ))}
-              {searchPerformed && selectedTrack && (
-                <button
-                  className={`search-track-confirm-button ${
-                    !selectedTrack ? "disabled" : ""
-                  }`}
-                  onClick={handleConfirmSelection}
-                  disabled={!selectedTrack}
-                >
-                  Confirm Selection
-                </button>
-              )}
             </>
           )}
         </div>

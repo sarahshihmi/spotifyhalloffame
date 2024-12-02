@@ -154,3 +154,7 @@
     background-color: #666;
   }
   
+  .loading-message{
+    color:white;
+    text-align: center;
+  }

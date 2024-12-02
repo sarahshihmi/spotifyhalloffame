@@ -204,6 +204,12 @@ h1 {
     text-align: center;
 }
 
+.not-logged-in{
+    color:white;
+}
+
+
+
 /* PYRAMID BAD ON MOBILE */
 @media (max-width: 1200px) {
     .ten-grid {
@@ -233,3 +239,4 @@ h1 {
         margin-bottom: 20px;
     }
 }
+

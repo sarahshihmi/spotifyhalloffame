@@ -19,6 +19,8 @@ const validateHallEntry = [         //initiate validation object
 
     check('artist_id').exists({ checkFalsy: true }).isString().withMessage('Artist ID is required.'),
 
+    check('song_id').exists({ checkFalsy: true }).isString().withMessage('Song ID is required.'),
+
     handleValidationErrors      //call handlevalidationerrors from our validation utility folder
 ]
 
@@ -28,7 +30,7 @@ router.get('/', async(req, res)=> {                             // calling get o
         const hallEntries = await Hall.findAll({                // create the object hallEntries as a result awaiting a find all in Hall model
             where: { user_id: req.user.id },                    // filter out the stuff only for the current user
             order: [['createdAt', 'DESC']],                      // order is in double array, createdAt, descending.
-            attributes: ['id', 'artist_name', 'song_name', 'artist_id']
+            attributes: ['id', 'artist_name', 'song_name', 'artist_id', 'song_id']
         })
         
         const token = req.user.access_token // retrieve the user's access token
@@ -37,10 +39,11 @@ router.get('/', async(req, res)=> {                             // calling get o
                 try {
                     const searchResults = await searchTrack(entry.song_name, token) // fetch track data from Spotify
 
-                    const track = searchResults.tracks.items.find(track =>
-                        track.name.toLowerCase() === entry.song_name.toLowerCase() &&
-                        track.artists.some(artist => artist.name.toLowerCase() === entry.artist_name.toLowerCase())
-                    )
+                    const track = searchResults.tracks.items.find(
+                        (track) =>
+                          track.id === entry.song_id && // Match by song ID
+                          track.artists.some((artist) => artist.id === entry.artist_id) // Match by artist ID
+                      );
                     if (!track) {
                         console.error(`No match found for "${entry.song_name}" by "${entry.artist_name}"`);
                         return { ...entry.toJSON(), albumImage: null };
@@ -66,13 +69,13 @@ router.get('/', async(req, res)=> {                             // calling get o
 
 
 //POST hall of fame entries
-router.post('/', requireAuth, validateHallEntry, async(req, res)=> {
-    const { artist_name, artist_id, song_name } = req.body
+router.post('/', requireAuth, validateHallEntry, async (req, res) => {
+    const { artist_name, artist_id, song_name, song_id } = req.body
 
     try{
         // Check for existing entry for the artist
         const existingEntry = await Hall.findOne({
-            where: { user_id: req.user.id, artist_name }
+            where: { user_id: req.user.id, artist_id },
         });
 
         if (existingEntry) {
@@ -88,21 +91,22 @@ router.post('/', requireAuth, validateHallEntry, async(req, res)=> {
             artist_name, 
             artist_id: artist_id,
             song_name,
-        })
+            song_id: song_id
+        });
 
-        
         res.status(201).json({ status: 'Hall of Fame entry added successfully', data: newEntry });
-    } catch (err){
-        console.error('Error adding Hall of Fame entry', err)
-        return res.status(500).json({error:'Internal Server Error'})
+    } catch (err) {
+        console.error('Error adding Hall of Fame entry', err);
+        return res.status(500).json({ error: 'Internal Server Error' });
     }
-})
+});
+
 
 
 //PUT hall of fame entry
 router.put('/:id', validateHallEntry, async(req, res)=>{
     const { id } = req.params
-    const {artist_name, song_name, artist_id} = req.body
+    const {artist_name, song_name, artist_id, song_id} = req.body
     try{
         const entry = await Hall.findOne({
             where: { id, user_id: req.user.id },
@@ -115,6 +119,7 @@ router.put('/:id', validateHallEntry, async(req, res)=>{
         if (artist_name) entry.artist_name = artist_name;
         if (song_name) entry.song_name = song_name;
         if (artist_id) entry.artist_id = artist_id;
+        if (song_id) entry.song_id = song_id;
 
         await entry.save()
         res.status(200).json({ status: 'Hall of Fame entry updated successfully', data: entry });

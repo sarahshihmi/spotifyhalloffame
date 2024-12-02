@@ -14,6 +14,8 @@ const Hall = () => {
   const sessionUser = useSelector((state) => state.session.user);
   const [songs, setSongs] = useState([]); // State to store songs
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
+
 
   const getCsrfTokenFromCookie = () => {
     const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/); // Match the CSRF token from cookies
@@ -29,6 +31,7 @@ const Hall = () => {
 
   useEffect(() => {
     const fetchSongs = async () => {
+      setLoading(true); // Start loading
       try {
         const response = await fetch('/api/hall', {
           headers: {
@@ -36,23 +39,26 @@ const Hall = () => {
             'X-CSRF-TOKEN': localStorage.getItem('XSRF-TOKEN'), // Include the CSRF token
           },
         });
-
+  
         if (!response.ok) {
           throw new Error('Failed to fetch songs.');
         }
-
+  
         const data = await response.json();
         setSongs(data.data); // Assuming data.data contains the songs
       } catch (err) {
         console.error('Error fetching songs:', err);
+      } finally {
+        setLoading(false); // Stop loading
       }
     };
-
+  
     if (sessionUser) fetchSongs();
   }, [sessionUser]); // Fetch songs only when sessionUser changes
+  
 
   if (!sessionUser) {
-    return <div>Please log in to view the Hall of Fame.</div>;
+    return <div className="not-logged-in">Please log in to view the Hall of Fame.</div>;
   }
 
   const handleDelete = async (id) => {
@@ -102,7 +108,9 @@ const Hall = () => {
           {isEditing ? "Done" : "Edit"}
         </button>
       </div>
-
+      {loading ? (
+      <p className="loading-message">Loading...</p>
+    ) : (
       <div className="hall-grid">
         {songs.length === 0 ? (
           <p>No songs added yet. Click Add to start!</p>
@@ -145,8 +153,9 @@ const Hall = () => {
           ))
         )}
       </div>
-    </div>
-  );
-};
+    )}
+  </div>
+);
+}
 
 export default Hall;

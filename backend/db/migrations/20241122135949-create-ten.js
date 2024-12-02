@@ -35,6 +35,10 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: false,
       },
+      song_id: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
@@ -45,11 +49,17 @@ module.exports = {
       },
     });
 
-    // Add a composite unique constraint on user_id and rank
+    // Add composite unique constraints
     await queryInterface.addConstraint('Tens', {
-      fields: ['user_id', 'rank'], // Columns for the unique constraint
-      type: 'unique', // Type of constraint
-      name: 'unique_user_rank', // Name of the constraint
+      fields: ['user_id', 'rank'], // User cannot have multiple entries with the same rank
+      type: 'unique',
+      name: 'unique_user_rank',
+    });
+
+    await queryInterface.addConstraint('Tens', {
+      fields: ['user_id', 'song_id'], // User cannot have multiple entries with the same song
+      type: 'unique',
+      name: 'unique_user_song_id',
     });
   },
   async down(queryInterface, Sequelize) {

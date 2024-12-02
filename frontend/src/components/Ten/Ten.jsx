@@ -58,7 +58,7 @@ const Ten = () => {
       }, [sessionUser]); // Fetch songs only when sessionUser changes
 
       if (!sessionUser) {
-        return <div>Please log in to view your Top Ten List.</div>;
+        return <div className="not-logged-in">Please log in to view your Top Ten List.</div>;
       }
 
       const handleDelete = async (id) => {

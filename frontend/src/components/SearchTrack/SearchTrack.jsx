@@ -13,7 +13,7 @@ const SearchTrack = ({ mode }) => {
   const [trackResults, setTrackResults] = useState([]);
   const [searchPerformed, setSearchPerformed] = useState(false); 
   const [selectedTrack, setSelectedTrack] = useState(null);
-  const [selectedRank, setSelectedRank] = useState(null); // New state variable
+  const [selectedRank, setSelectedRank] = useState(null); // New state variable.
   const [existingEntry, setExistingEntry] = useState(null); // Track existing entry
   const [conflictingEntry, setConflictingEntry] = useState(null); // Track conflicting entry for ten
   const [showConfirmation, setShowConfirmation] = useState(false); // Toggle confirmation screen

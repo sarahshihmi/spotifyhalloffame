@@ -1,4 +1,4 @@
-const express = require('express') //defining express
+const express = require('express') //defining express.
 const router = express.Router() //defining the router
 const { check } = require('express-validator'); // this is a check
 const { handleValidationErrors } = require ('../../utils/validation') //for validation

@@ -1,5 +1,5 @@
 # Welcome to the Spotify Hall of Fame README!
-Access your Hall of Fame [HERE](https://spotifyhalloffame.onrender.com/)
+Access your Hall of Fame [HERE](https://spotifyhalloffame.fly.dev/)
 
 You can find information about the Hall of Fame features, schema, and wireframes here.
 * [Features](https://github.com/sarahshihmi/spotifyhalloffame/wiki/Features): for understanding what this app can do.
